@@ -1,0 +1,40 @@
+# Clears and rebuilds the github pages branch, lists the latest BOM report files for the report to consume
+name: Report
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: [Scan]
+    types:
+      - completed
+  push:
+    branches:
+      - main
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_mod-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-mode_mod-
+      - run: |
+          npm i
+          npm run build
+      - uses: actions/download-artifact@3
+        with:
+          workflow: scan.yml
+          workflow_conclusion: success
+          name: sbom
+          path: public
+      - run: node .github/workflows/list-boms.js
+      - run: ./.github/workflows/write-gh-pages.sh
+        env:
+          TARGET_BRANCH: gh-pages

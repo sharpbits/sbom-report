@@ -1,0 +1,13 @@
+{
+  "problemMatcher": [
+      {
+          "owner": "scan",
+          "pattern": [
+              {
+                  "regexp": "^(fatal|error): (.*)$",
+                  "message": 2
+              }
+          ]
+      }
+  ]
+}

@@ -1,0 +1,29 @@
+name: Scan
+
+on:
+  workflow_dispatch:
+  #schedule:
+  #  - cron: '1 7 * * 0' # Weekly on Synday at 7 UTC
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - uses: actions/checkout@v3
+      - uses: DT-SFI/sbom-scanner-action@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          organizations: sharpbits
+          manifestFilename: manifest.yml
+          outputDataFile: sbom.json
+      - run: mv sbom.json sbom-$(date +%d-%m-%Y_%H-%M).json
+        shell: bash
+      - uses: actions/upload-artifact@v3
+        with:
+          name: sbom
+          path: sbom*.json
+          if-no-files-found: error
+          retention-days: 90
