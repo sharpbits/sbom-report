@@ -1,0 +1,7 @@
+project_name: SBOM Report
+project_type: Github Action
+
+components:
+  - id: sbom-report
+    name: SBOM Report
+    root_directory: /

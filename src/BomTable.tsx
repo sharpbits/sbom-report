@@ -3,16 +3,25 @@ import { DataGrid, GridColDef, GridFooter, GridFooterContainer, GridRenderCellPa
 import Grid from '@mui/material/Unstable_Grid2'
 import { generateBomRowData } from './util/bom-data'
 import { css } from '@emotion/react'
+import { GridInitialStateCommunity } from '@mui/x-data-grid/models/gridStateCommunity'
 
-function multilineTextRender(cellValues: GridRenderCellParams<string>) {
+declare module '@mui/x-data-grid' {
+  interface FooterPropsOverrides {
+    scanDate: string;
+    scanTime: string;
+    orgs: string;
+  }
+}
+
+function multilineTextRender(cellValues: GridRenderCellParams<{[key: string]: string}>) {
   return <div>
-    { cellValues.value?.split('\n').map(v => (<div key={v}>{v}</div>)) }
+    { cellValues.value?.split('\n').map((v: any) => (<div key={v}>{v}</div>)) }
   </div>
 }
 
 const columns: GridColDef[] = [
   { field: 'repo', headerName: 'Repository', width: 200 },
-  { field: 'service_name', headerName: 'Service', width: 250},
+  { field: 'service_name', headerName: 'Component', width: 250},
   { field: 'maintainer_email', headerName: 'Maintainer', width: 150},
   { field: 'ci_id', headerName: 'ID', width: 90},
 
@@ -59,10 +68,10 @@ const initialState = {
   },
   filter: {
     filterModel: {
-      items: [{ columnField: 'service_name', operatorValue: 'isNotEmpty', value: '' }]
+      items: [{ field: 'service_name', operator: 'isNotEmpty', value: '' }]
     }
   }
-}
+} as GridInitialStateCommunity
 
 const infoBar = css({
   backgroundColor: '#333',
@@ -151,11 +160,11 @@ function BomTable() {
               rows={bomRows}
               columns={columns}
               initialState={initialState}
-              components={{
-                Toolbar: GridToolbar,
-                Footer: CustomFooter
+              slots={{
+                toolbar: GridToolbar,
+                footer: CustomFooter
               }}
-              componentsProps={{
+              slotProps={{
                 footer: {
                   scanDate: new Date(bom.scan_date).toDateString() ?? 'Invalid',
                   scanTime: `${Math.ceil(bom.scan_elapsed_ms/1000)} seconds`,
