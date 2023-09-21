@@ -13,7 +13,7 @@ jobs:
         with:
           node-version: 16.x
       - uses: actions/checkout@v3
-      - uses: DT-SFI/sbom-scanner-action@main
+      - uses: sharpbits/sbom-scanner-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           organizations: sharpbits
